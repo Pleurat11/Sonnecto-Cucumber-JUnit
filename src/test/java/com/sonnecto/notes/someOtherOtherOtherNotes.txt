@@ -1,0 +1,45 @@
+Scenario and Scenario outline:
+
+    Scenario -> similar to @Test in TestNG
+             -> combination of steps to test a functionality of the app.
+             ->all steps run once and we can pass parameters.
+
+    Scenario Outline:
+             -> is mainly used for Data driven testing
+             -> used with Examples table where we pass sets of data.
+             -> steps in the scenario outline repeat for each row of data in Examples table.
+=======================================================================
+    Datatable vs Examples table:
+        Datatable is used to pass parameters/list of data to a certain step:
+            Then students names should be present:
+                |Peja|
+                |Liki|
+                the above steps will accept student names as a List of String.
+                That step will run only once and not repeatedly for each student.
+
+
+        Examples table is used to pass data for the whole scenario and scenario will
+            run repeatedly for each row of data.
+                When User searches for "<studentID>" in system
+                Then students "<name>" should be visible
+                Examples:
+                    |studentID|name|
+                    |100|Peja|
+                    |200|Liki|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

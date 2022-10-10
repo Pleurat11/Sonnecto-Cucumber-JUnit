@@ -1,0 +1,137 @@
+
+PLUGINS in CukesRunner class:
+    We can add plugins to CukesRunner class to generate reports.
+
+    Generate html report of execution:
+
+
+    @RunWith(Cucumber.class)
+    @CucumberOptions(
+
+        plugin = {
+        "html:target/cucumber-report.html"
+        }
+
+        features = ...,
+        glue = ...,
+        tags = ...
+
+
+}
+    public class CukesRunner{
+
+    }
+=======================================================================================
+Passing parameters using scenario steps
+-Background
+
+-@Before, @After, @BeforeStep, @AfterStep
+-Parameterization...
+=======================================================================================
+
+Passing parameters from feature file:
+
+    Lets look at this step below, it has city name within double quotes:
+
+    When User enters "McLean, VA" to pickup address
+
+    When we generate a step for above step, Cucumber will look at "Mclean, VA" as a String parameters.
+    So to match it, we need to write our step definition like below:
+
+    @When("User enters {string} to pickup address")
+    public void user_enters_to_pickup_address(String pickUpLocation){
+    }
+
+    {string} -> means String parameter. And we can pass different values, not only "Mclean, VA"
+
+    EX: When User enters "Brooklyn, NY" to pickup address
+        When User enters "Whatever, something" to pickup address
+
+
+    When we have a parameter coming from cucumber scenario step, our java method in Step Definition class
+    needs to have a String parameter.
+==========================================
+
+    When User enters 155 to amount field
+
+    @When("User enters {int} to amount field")
+    public void userEntersAmount(int amount){
+        amount ==> 155
+    }
+==========================================
+
+Multiple String parameters from scenario
+
+    When User enters "Boston, MA" to pickup address "New York, NY" to drop-off address
+
+    @When("User enters {string} to pickup address{string} to drop-off address")
+        public void userEntersAmount(String pickUpLocation, String dropOffLocation){
+            amount ==> 155
+        }
+
+==================================================================
+
+Smoke tests => dev env
+            => QA env
+            => staging
+            => Production
+
+Regression tests(at the end of each sprint)
+                 => dev env
+                 => QA env
+                 => staging
+                 => Production(before release)
+
+    If you're running automation in production phase, you need dedicated credentials and test data.
+==================================================================
+
+So far in Cucumber:
+    Feature files
+    Step Definition classes
+    dryRun
+    CukesRunner
+    @tags
+    plugins
+    passing step parameters
+      passing single parameters
+      passing multiple parameters
+
+When passing parameters, we can pass single value or list of vaules to the step.
+
+    Ex: single => When User searches for "java"
+        multiple => When User searches for: "the following"
+                                           "java"
+                                           "selenium"
+                                           "cucumber"
+
+IMPLEMENTATION:
+    @When("User searches for {string}")
+    public void userSearchesFor(String value){}
+
+    @When("User searches for {string}")
+        public void userSearchesFor(List<String> values){}
+
+
+When passing multiple values, our method parameter will be a List.
+======================================================================
+
+    In the background, cucumber framework will create hashmap and add values similar to below:
+        Map<Integer, Integer> valuesMap = new HashMap();
+        valuesMap.put(100,5);
+        valuesMap.put(500,25);
+        valuesMap.put(1300,65);
+        valuesMap.put(2100,105);
+
+How to read values from a Map?
+
+    valuesMap.get(100) => 5
+    valuesMap.get(500) => 25
+
+How to loop through each key in the Map?
+
+    for(Integer inputKey : valueMap.keySet()){
+        enter inputKey into target number
+        click calculate
+        read 5% result and compare with inputKey's value in the map:
+        valueMap.get(inputKey) =>
+    }

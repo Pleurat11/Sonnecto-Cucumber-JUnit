@@ -1,0 +1,142 @@
+
+Background: is a Gherking language keyword and is used in Feature file.
+            -steps in the Background will run before each scenario in that feature file.
+            -it is applicable only in the feature file it is located in.
+            -We can put pre-conditions or common starting steps
+                for the scenarios in that feature file: login, open browser etc...
+
+
+Hooks class: contains @Before, @After, @BeforeStep, @AfterStep annotations,
+             and it is global for all the scenarios in all the feature files.
+             -steps for setUp or tearDown run before and after each scenario.
+             -we use it for setting up browser,closing the browser, taking screenshots etc...
+
+Similarities are: Both of them can be configured before the scenario.
+But remember: Background is only for the same feature file and does not affect any other ones.
+               Hooks class affect each scenario in all of the feature files.
+               Unless you filter by @tagName
+===============================================================================================
+
+TAKING SCREENSHOT USING SELENIUM:
+    We use TakesScreenShot interface in Selenium to take Screenshot of the browser.
+        Normally we take screenshot and save into the report when scenario or test fails.
+
+    Syntax:
+        TakesScreenshot screenshot = (TakesScreenshot)driver;
+        byte [] image = screenshot.getScreenshotAs(OutputType.BYTES);
+
+        The image is byte array and can be attached to the report.
+        If we want to save as a file, we newed to change the type of output:
+
+        File [] imageFile = screenshot.getScreenshotAs(OutputType.FILE);
+            //copy the image file into the location
+
+        byte[] image = ((TakeScreenshot)driver).getScreenshotAs(OutputType.BYTES);
+
+        Then we attach the screenshot to the report.
+
+        Let's see how we can use it with @After tearDown method in the Hooks class.
+
+        @After
+        public void tearDownScenario(Scenario scenario){
+            byte[] image = ((TakeScreenshot)driver).getScreenshotAs(OutputType.BYTES);
+            scenario.attach(image, "image/png", scenario.getName());
+        }
+
+=============================================================================================================
+
+We need 2 steps to take screenshot of the browser:
+    1)Cast driver to TakesScreenshot Interface
+    2)Call takeScreenshotAs method and specify the output type: FILE, BYTE.
+
+How do you put the screenshot into html report in your framework?
+    I have Hooks class in my framework with @After annotated tearDown method.
+    So, if a scenario fails, I take screenshot as byte [] array and attach to the report.
+
+    if(scenario.isFailed){}
+
+How to take screenshot of each step to save as execution evidence?
+
+    We can use @AfterStep as annotation in Hooks class.
+
+============================================================================================================
+
+Why do we need to take screenshots?
+    Whenever a test fails we need to document the evidence as a screenshot.
+        We can use that in our bug report in Jira or share sc with the team.
+
+When I see that a test has failed:
+    -Share screenshot in team channel with details of what is expected result and what is actual result.
+    -After team confirms this is a valid issue, I will go ahead and create a bug report
+        story and add to backlog.
+    -Depending on the bug severity:
+        It might be added to current sprint if it needs to be taken care of right away.
+        Or it might be added to the following sprint and assigned to a developer.
+
+===================================================
+A good bug report must have:
+    Bug ID/Number
+    Bug Title
+    Priority&Severity
+    Environment
+    Description
+    Steps to reproduce
+    Expected&Actual results
+    Screenshot.
+====================================================
+
+Scenario Outline in Cucumber BDD.
+
+We use Scenario Outline to perform Data Driven test using Cucumber.
+
+Data Driven Test -> Testing the SAME functionality of the app using multiple sets of inputs/parameters.
+                EX: Login using multiple credentials, we store usernames and passwords in a separate
+                    file and not in our code.
+Test Data and Automation code NEED TO BE SEPARATED.
+
+Test Data can be stored in: Feature file Scenario Outline
+                            Excel Files
+                            Json files
+                            csv files
+                            yaml files
+                            text files.
+
+Test Data ----------> Automation Code -------> Results for each set of data.
+
+
+========================================================
+Let's learn how to do DTT using Cucumber Scenario Outline.
+
+    Scenario Outline:
+        Let's run the test scenario with multiple sets of data.
+        Scenario steps will run for each data set in the Examples table.
+        We provide data in Examples table separated with "|" pipes
+        EX:
+
+        Scenario Outline: Data Driven Test
+            Given User is on Etsy homepage
+            When User searches for <itemName> in Etsy
+            Then User should see at least <expectedCount> results
+            Examples:
+            |itemName|expectedCount|
+            |leather jacket|985|
+            |wooden spoon|2354|
+            |iphone case|5000|
+
+    Scenario Outline: Library login data driven test
+        Given user is at library login page
+        Then User logs in using "<email>" and "<password>"
+        Then Login should be successful
+        Examples:
+            |email|password|
+            |test1@mail.com|abc123|
+            |test2@mail.com|abc1234|
+            |test3@mail.com|abc12345|
+
+
+
+
+
+
+
+

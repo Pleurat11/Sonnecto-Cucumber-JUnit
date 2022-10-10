@@ -1,0 +1,80 @@
+How do you re-run the failed tests/scenarios?
+
+Let's say we have 100 tests/scenarios and we executed all of them.
+Then you see that 7 of them failed.
+Now we want to re-run only the failed test scenarios:
+
+-1) option could be to: identify failed scenarios and add @rerun tag for them and run
+        CukesRunner with that tag.
+        This is time-consuming and not efficient way. We don't do that.
+
+-2)option could be to run the tests using maven. We can ask maven to re-run the test certain number of times
+    if it fails.
+                 mvn -Dsurefire.rerunFailingTestCount=1 test
+    For the above to work, we need to use maven command line commands to run our tests.
+
+    -Dsurefire.rerunFailingTestCount=1 => is a parameter that we pass,
+            1 means reRun the test ONCE if it fails. We can change that number to a different one.
+
+
+-3) Using Cucumber rerun plugin.
+1)Add a "rerun:target/rerun.txt" to our CukesRunner plugins.
+    It will collect the failed scenarios into a text file.
+2)Add a separate CukesRunner that picks up that file and runs each scenario in that text file:
+
+    public class FailedTestRunner{
+        plugin{
+            ""
+        }
+    }
+
+Main CukesRunner will run the tests and collect all failed ones to rerun.txt file.
+Then when we run the new FailedTestRunner, it will read rerun.txt file and run only those.
+
+=====================================================================================
+
+Why rerun a failed test?
+    -To make sure that this is an actual app bug, not automation code issue.
+        -Let's say for the second time it passes, it might mean our automation code
+            needs some updates.
+        It might also mean that application is not stable enough.
+
+Purpose is not just to pass the failed tests, it is to see if it repeatedly fails or it will pass next time.
+If it repeatedly fails, it means app has a bug, provided that our automation code is correct.
+
+If it fails and then passes, it means: automation code has bugs, sync issues, data corrupted etc.
+
+------------------------
+Summary:
+    When a test fails, I analyze the reason for the failure.
+    I read my framework automation html reports and look at screenshots.
+    I try to follow the test steps manually to see if it works manually.
+    I also have mechanism in my framework to re-run the fail0.ed tests/scenarios.
+
+    After all the steps above, if it is automation code issue, I will update my test script.
+    If it is app issue, I make sure that it's a bug and create a bug report in Jira.
+
+====================================
+How do you re-run the failed test scenarios?
+
+    In my CukesRunner, I have a plugin that starts with "rerun:target/rerun.txt".
+        So when I execute my scenarios, the failed ones will automatically go to rerun.txt file.
+    Then I have a dedicated FailedTestsRunner class to run the scenarios that are in rerun.txt.
+
+    So if I see any failed scenarios, I run the FailedTestsRunner and analyze the results.
+    It is useful to make sure that if a test fails, it is indeed a bug and not a script issue.
+
+=======================================================================================================
+    How do you do parallel execution of your tests in your framework?
+
+       I use maven surefire plugin to perform multithreaded parallel execution of my tests.
+
+When we have many tests, we can execute them in parallel mode, so multiple tests run at same time.
+
+To support that, we need to change our Driver class. It should have driver pool, instead of single driver.
+
+private static ThreadLocal<WebDriver> driverPool = new ThreadLocal<>();
+
+ThreadLocal<WebDriver> will allow us to open multiple WebDrivers at the same time.
+
+If we have single static WebDriver like before, we will not be able to perform parallel execution.
